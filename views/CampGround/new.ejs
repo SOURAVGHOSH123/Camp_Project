@@ -1,0 +1,53 @@
+<% layout('layouts/boilerplate') %>
+   <div class="row">
+      <h1 class="text-center">Create New CampGround</h1>
+      <div class="col-md-6 offset-3">
+         <form class="form text-dark validated-form" enctype="multipart/form-data" action="/campgrounds" method="post"
+            novalidate>
+            <div class="mb-3">
+               <label class="form-label" for="title">Title</label>
+               <input class="form-control" type="text" id="title" placeholder="Enter the title" name="campground[title]"
+                  required>
+               <div class="valid-feedback">
+                  Look Good!
+               </div>
+            </div>
+
+            <div class="mb-3">
+               <label class="form-label" for="location">location</label>
+               <input class="form-control" type="text" id="location" placeholder="Enter the location"
+                  name="campground[location]" required>
+               <div class="valid-feedbacK">Look Good!</div>
+            </div>
+
+            <!-- <div class="mb-3">
+               <label class="form-label" for="image">Image</label>
+               <input type="file" name="image" id="image" multiple>
+            </div> -->
+            <div class="mb-3">
+               <div class="input-group mb-3">
+                  <input type="file" class="form-control" name="image" id="image" multiple>
+                  <label class="input-group-text" for="image">Browser</label>
+               </div>
+            </div>
+            <div class="mb-3">
+               <label class="form-label" for="description">description</label>
+               <textarea class="form-control" type="text" id="description" placeholder="Enter the description"
+                  name="campground[description]" required></textarea>
+               <div class="valid-feedback">Look Good!</div>
+            </div>
+            <div class="mb-3">
+               <label class="form-label" for="price">Price</label>
+               <div class="input-group">
+                  <span class="input-group-text" id="price-label">$</span>
+                  <input class="form-control" type="text" id="price" placeholder="0.0" aria-label="price"
+                     name="campground[price]" arisdescribedby="price-label" required>
+                  <div class="valid-feedback">Look Good!</div>
+               </div>
+            </div>
+            <div class="mb-3">
+               <button class="btn btn-success">Add Campground</button>
+            </div>
+         </form>
+      </div>
+   </div>
