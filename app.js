@@ -1,7 +1,7 @@
-// if (process.env.NODE_ENV !== 'production') {
-//    require('dotenv').config();
-// }
-require('dotenv').config();
+if (process.env.NODE_ENV !== 'production') {
+   require('dotenv').config();
+}
+// require('dotenv').config();
 
 
 const express = require('express')
@@ -25,8 +25,12 @@ const helmet = require("helmet")
 const userRoutes = require('./router/user.js')
 const campgroundRoutes = require('./router/campgrounds.js')
 const reviewRoutes = require('./router/reviews.js')
+const MongoStore = require('connect-mongo');
+// const MongoDBStore = require("connect-mongo")(session);
 
-mongoose.connect('mongodb://localhost:27017/yelp-camp')
+// const dbURL = process.env.DB_URL;
+const dbURL = 'mongodb://localhost:27017/yelp-camp';
+mongoose.connect(dbURL)
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, "Connection Error:"))
@@ -43,15 +47,34 @@ app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
 app.use(
    mongoSanitize({
-     replaceWith: '_',
+      replaceWith: '_',
    }),
- );
+);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+// const store = new MongoDBStore({
+//    url: dbURL,
+//    secret: 'thisshouldbebettersecret',
+//    touchAfter: 24 * 60 * 60
+// })
+
+const secret = process.env.SECRET || 'thisshouldbeabettersecret!';
+
+const store = MongoStore.create({
+   mongoUrl: dbURL,
+   touchAfter: 24 * 60 * 60,
+   secret,
+});
+
+store.on("error", function (e) {
+   console.log("Session store error", e);
+})
+
 const sessionConfig = {
+   store,
    name: 'session',
-   secret: 'thisshouldbebettersecret',
+   secret,
    resave: false,
    saveUninitialized: true,
    cookie: {
@@ -94,25 +117,25 @@ const connectSrcUrls = [
 
 const fontSrcUrls = [];
 app.use(
-    helmet.contentSecurityPolicy({
-        directives: {
-            defaultSrc: [],
-            connectSrc: ["'self'", ...connectSrcUrls],
-            scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
-            styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
-            workerSrc: ["'self'", "blob:"],
-            objectSrc: [],
-            imgSrc: [
-                "'self'",
-                "blob:",
-                "data:",
-                "https://res.cloudinary.com/df08ufqmp/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT! 
-                "https://images.unsplash.com/",
-                "https://api.maptiler.com/",
-            ],
-            fontSrc: ["'self'", ...fontSrcUrls],
-        },
-    })
+   helmet.contentSecurityPolicy({
+      directives: {
+         defaultSrc: [],
+         connectSrc: ["'self'", ...connectSrcUrls],
+         scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
+         styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+         workerSrc: ["'self'", "blob:"],
+         objectSrc: [],
+         imgSrc: [
+            "'self'",
+            "blob:",
+            "data:",
+            "https://res.cloudinary.com/df08ufqmp/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT! 
+            "https://images.unsplash.com/",
+            "https://api.maptiler.com/",
+         ],
+         fontSrc: ["'self'", ...fontSrcUrls],
+      },
+   })
 );
 
 
